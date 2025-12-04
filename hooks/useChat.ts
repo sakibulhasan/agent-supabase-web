@@ -16,7 +16,7 @@ interface UseChatOptions {
 }
 
 export function useChat(options: UseChatOptions = {}) {
-  const { apiUrl = 'http://localhost:8080/ask', onError } = options
+  const { apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/ask', onError } = options
   
   const [messages, setMessages] = useState<Message[]>([])
   const [isLoading, setIsLoading] = useState(false)

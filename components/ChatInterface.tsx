@@ -68,7 +68,8 @@ export default function ChatInterface() {
     setIsLoading(true)
 
     try {
-      const response = await fetch('http://localhost:8080/ask', {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/ask'
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
