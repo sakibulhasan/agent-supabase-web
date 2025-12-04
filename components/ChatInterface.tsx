@@ -35,13 +35,12 @@ export default function ChatInterface() {
     scrollToBottom()
   }, [messages])
 
-  // Simulate typing effect for a message
   const simulateTyping = async (text: string, messageId: string) => {
     setTypingMessageId(messageId)
     const words = text.split(' ')
     
     for (let i = 0; i < words.length; i++) {
-      await new Promise(resolve => setTimeout(resolve, 30)) // 30ms per word for smooth effect
+      await new Promise(resolve => setTimeout(resolve, 30))
       
       setMessages(prev =>
         prev.map(msg =>
@@ -83,19 +82,17 @@ export default function ChatInterface() {
 
       const data = await response.json()
       
-      // Create assistant message with empty content initially
       const assistantMessageId = (Date.now() + 1).toString()
       const assistantMessage: Message = {
         id: assistantMessageId,
         role: 'assistant',
         content: '',
-        fullResponse: data, // Store the full response
+        fullResponse: data,
       }
 
       setMessages(prev => [...prev, assistantMessage])
       setIsLoading(false)
 
-      // Extract summary from response, or use the entire response as fallback
       let responseText = ''
       if (data.summary) {
         responseText = data.summary
@@ -113,7 +110,7 @@ export default function ChatInterface() {
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: 'Sorry, I encountered an error connecting to the backend. Please make sure the server is running on http://localhost:8080',
+        content: 'Sorry, I encountered an error connecting to the backend.',
       }
       
       setMessages(prev => [...prev, errorMessage])
@@ -129,225 +126,136 @@ export default function ChatInterface() {
   }
 
   return (
-    <section id="chat" className="py-24 relative">
-      <div className="container mx-auto px-6">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-12"
-        >
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">
-            Experience AI{' '}
-            <span className="bg-gradient-to-r from-rapidscale-400 to-purple-500 bg-clip-text text-transparent">
-              Intelligence
-            </span>
-          </h2>
-          <p className="text-xl text-gray-400">
-            Ask anything. Get instant, intelligent responses.
-          </p>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="max-w-4xl mx-auto"
-        >
-          {/* Chat Container */}
-          <div className="glass rounded-3xl overflow-hidden shadow-2xl shadow-rapidscale-500/10">
-            {/* Messages Area */}
-            <div className="h-[600px] overflow-y-auto p-6 space-y-6 scrollbar-thin scrollbar-thumb-rapidscale-500 scrollbar-track-gray-800">
-              <AnimatePresence>
-                {messages.map((message) => (
-                  <motion.div
-                    key={message.id}
-                    initial={{ opacity: 0, y: 20, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.95 }}
-                    transition={{ duration: 0.3 }}
-                    className={`flex gap-4 ${
-                      message.role === 'user' ? 'flex-row-reverse' : 'flex-row'
+    <div className="flex-1 flex flex-col pt-20">
+      <div className="flex-1 overflow-y-auto">
+        <div className="max-w-3xl mx-auto px-4 py-8">
+          <AnimatePresence>
+            {messages.map((message) => (
+              <motion.div
+                key={message.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                className={`flex gap-4 mb-8 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+              >
+                {message.role === 'assistant' && (
+                  <div
+                    onClick={() => message.fullResponse && setSelectedMessage(message)}
+                    className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
+                      message.fullResponse ? 'bg-rapidscale-600 cursor-pointer hover:bg-rapidscale-700 transition-colors' : 'bg-rapidscale-600'
                     }`}
+                    title={message.fullResponse ? 'Click to view full response' : ''}
                   >
-                    {/* Avatar */}
-                    <div
-                      onClick={() => message.role === 'assistant' && message.fullResponse && setSelectedMessage(message)}
-                      className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${
-                        message.role === 'user'
-                          ? 'bg-gradient-to-br from-rapidscale-500 to-rapidscale-600'
-                          : message.fullResponse
-                          ? 'bg-gradient-to-br from-purple-500 to-pink-600 cursor-pointer hover:scale-110 transition-transform'
-                          : 'bg-gradient-to-br from-purple-500 to-pink-600'
-                      }`}
-                      title={message.role === 'assistant' && message.fullResponse ? 'Click to view full response' : ''}
-                    >
-                      {message.role === 'user' ? (
-                        <User className="w-5 h-5 text-white" />
-                      ) : (
-                        <Bot className="w-5 h-5 text-white" />
+                    <Bot className="w-4 h-4 text-white" />
+                  </div>
+                )}
+
+                <div className={`max-w-[80%] ${message.role === 'user' ? 'bg-rapidscale-600 text-white rounded-2xl px-4 py-3' : 'text-gray-800'}`}>
+                  {message.role === 'assistant' ? (
+                    <div className="text-sm leading-relaxed prose prose-sm max-w-none">
+                      <ReactMarkdown
+                        components={{
+                          p: ({ children }) => <p className="mb-3 last:mb-0 text-gray-800">{children}</p>,
+                          strong: ({ children }) => <strong className="font-bold text-rapidscale-700">{children}</strong>,
+                          ul: ({ children }) => <ul className="list-disc ml-4 space-y-1 text-gray-700">{children}</ul>,
+                          li: ({ children }) => <li className="text-gray-700">{children}</li>,
+                        }}
+                      >
+                        {message.content}
+                      </ReactMarkdown>
+                      {typingMessageId === message.id && (
+                        <span className="inline-block w-1 h-4 ml-1 bg-rapidscale-600 animate-pulse"></span>
                       )}
                     </div>
-
-                    {/* Message Content */}
-                    <div
-                      className={`flex-1 max-w-[80%] ${
-                        message.role === 'user' ? 'text-right' : 'text-left'
-                      }`}
-                    >
-                      <div
-                        className={`inline-block p-4 rounded-2xl ${
-                          message.role === 'user'
-                            ? 'bg-gradient-to-br from-rapidscale-600 to-rapidscale-500 text-white'
-                            : 'glass'
-                        }`}
-                      >
-                        {message.role === 'assistant' ? (
-                          <div className="text-sm md:text-base leading-relaxed prose prose-invert prose-sm max-w-none">
-                            <ReactMarkdown
-                              components={{
-                                p: ({ children }) => <p className="mb-3 last:mb-0">{children}</p>,
-                                strong: ({ children }) => <strong className="font-bold text-rapidscale-300">{children}</strong>,
-                                ul: ({ children }) => <ul className="list-disc ml-4 space-y-1">{children}</ul>,
-                                li: ({ children }) => <li className="text-gray-300">{children}</li>,
-                              }}
-                            >
-                              {message.content}
-                            </ReactMarkdown>
-                            {typingMessageId === message.id && (
-                              <span className="inline-block w-1 h-4 ml-1 bg-rapidscale-400 animate-pulse"></span>
-                            )}
-                          </div>
-                        ) : (
-                          <p className="text-sm md:text-base leading-relaxed whitespace-pre-wrap">
-                            {message.content}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-
-              {/* Thinking Indicator */}
-              {isLoading && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="flex gap-4"
-                >
-                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center">
-                    <Bot className="w-5 h-5 text-white" />
-                  </div>
-                  <div className="glass p-4 rounded-2xl">
-                    <div className="flex gap-2 items-center">
-                      <Loader2 className="w-4 h-4 animate-spin text-rapidscale-400" />
-                      <span className="text-sm text-gray-400">Thinking...</span>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-
-              <div ref={messagesEndRef} />
-            </div>
-
-            {/* Input Area */}
-            <div className="border-t border-white/10 p-6 bg-gray-900/50">
-              <div className="flex gap-4 items-end">
-                <div className="flex-1">
-                  <textarea
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    onKeyDown={handleKeyPress}
-                    placeholder="Type your message..."
-                    rows={1}
-                    className="w-full bg-gray-800/50 border border-white/10 rounded-xl px-4 py-3 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-rapidscale-500 focus:border-transparent resize-none"
-                    style={{ minHeight: '48px', maxHeight: '120px' }}
-                  />
+                  ) : (
+                    <p className="text-sm leading-relaxed">{message.content}</p>
+                  )}
                 </div>
-                <button
-                  onClick={sendMessage}
-                  disabled={!input.trim() || isLoading}
-                  className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-rapidscale-600 to-rapidscale-500 hover:from-rapidscale-500 hover:to-rapidscale-400 disabled:from-gray-700 disabled:to-gray-600 disabled:cursor-not-allowed rounded-xl flex items-center justify-center transition-all duration-300 hover:scale-105 disabled:hover:scale-100"
-                >
-                  <Send className="w-5 h-5 text-white" />
-                </button>
+
+                {message.role === 'user' && (
+                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center">
+                    <User className="w-4 h-4 text-white" />
+                  </div>
+                )}
+              </motion.div>
+            ))}
+          </AnimatePresence>
+
+          {isLoading && (
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex gap-4 mb-8">
+              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-rapidscale-600 flex items-center justify-center">
+                <Bot className="w-4 h-4 text-white" />
               </div>
-              <p className="text-xs text-gray-500 mt-3 text-center">
-                Press Enter to send, Shift + Enter for new line
-              </p>
-            </div>
-          </div>
-        </motion.div>
+              <div className="flex items-center gap-2">
+                <Loader2 className="w-4 h-4 animate-spin text-rapidscale-600" />
+                <span className="text-sm text-gray-500">Thinking...</span>
+              </div>
+            </motion.div>
+          )}
+
+          <div ref={messagesEndRef} />
+        </div>
       </div>
 
-      {/* JSON Response Modal */}
+      <div className="sticky bottom-0 bg-gray-50 py-4">
+        <div className="max-w-3xl mx-auto px-4">
+          <div className="flex gap-3 items-end bg-white border border-gray-300 rounded-2xl shadow-lg p-2 hover:border-gray-400 focus-within:border-rapidscale-500 transition-colors">
+            <input
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKeyPress}
+              placeholder="Message RapidScale AI..."
+              className="flex-1 bg-transparent px-3 py-2 text-gray-900 placeholder-gray-500 focus:outline-none text-sm"
+            />
+            <button
+              onClick={sendMessage}
+              disabled={!input.trim() || isLoading}
+              className="flex-shrink-0 w-8 h-8 bg-rapidscale-600 hover:bg-rapidscale-700 disabled:bg-gray-300 disabled:cursor-not-allowed rounded-lg flex items-center justify-center transition-colors"
+            >
+              <Send className="w-4 h-4 text-white" />
+            </button>
+          </div>
+          <p className="text-xs text-gray-500 mt-2 text-center">
+            RapidScale AI can make mistakes. Consider checking important information.
+          </p>
+        </div>
+      </div>
+
       <AnimatePresence>
         {selectedMessage && (
           <>
-            {/* Backdrop */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setSelectedMessage(null)}
-              className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50"
-            />
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setSelectedMessage(null)} className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50" />
             
-            {/* Modal */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="fixed inset-0 z-50 flex items-center justify-center p-4"
-              onClick={() => setSelectedMessage(null)}
-            >
-              <div
-                onClick={(e) => e.stopPropagation()}
-                className="glass rounded-2xl max-w-4xl w-full max-h-[80vh] overflow-hidden flex flex-col"
-              >
-                {/* Modal Header */}
-                <div className="flex items-center justify-between p-6 border-b border-white/10">
+            <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setSelectedMessage(null)}>
+              <div onClick={(e) => e.stopPropagation()} className="bg-white rounded-2xl max-w-4xl w-full max-h-[80vh] overflow-hidden flex flex-col shadow-2xl border border-gray-200">
+                <div className="flex items-center justify-between p-6 border-b border-gray-200">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-full bg-rapidscale-600 flex items-center justify-center">
                       <Bot className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <h3 className="text-xl font-bold text-white">Full Response Data</h3>
-                      <p className="text-sm text-gray-400">JSON formatted response</p>
+                      <h3 className="text-xl font-bold text-gray-900">Full Response Data</h3>
+                      <p className="text-sm text-gray-600">JSON formatted response</p>
                     </div>
                   </div>
-                  <button
-                    onClick={() => setSelectedMessage(null)}
-                    className="w-10 h-10 rounded-xl glass glass-hover flex items-center justify-center transition-colors"
-                  >
-                    <X className="w-5 h-5 text-gray-400" />
+                  <button onClick={() => setSelectedMessage(null)} className="w-10 h-10 rounded-xl hover:bg-gray-100 flex items-center justify-center transition-colors">
+                    <X className="w-5 h-5 text-gray-600" />
                   </button>
                 </div>
 
-                {/* Modal Content */}
-                <div className="flex-1 overflow-y-auto p-6">
-                  <pre className="bg-gray-900/50 rounded-xl p-6 text-sm text-gray-300 overflow-x-auto">
+                <div className="flex-1 overflow-y-auto p-6 bg-gray-50">
+                  <pre className="bg-gray-900 rounded-xl p-6 text-sm text-gray-100 overflow-x-auto">
                     {JSON.stringify(selectedMessage.fullResponse, null, 2)}
                   </pre>
                 </div>
 
-                {/* Modal Footer */}
-                <div className="p-6 border-t border-white/10 flex justify-end gap-3">
-                  <button
-                    onClick={() => {
-                      navigator.clipboard.writeText(JSON.stringify(selectedMessage.fullResponse, null, 2))
-                    }}
-                    className="px-6 py-2 glass glass-hover rounded-lg font-medium transition-colors"
-                  >
+                <div className="p-6 border-t border-gray-200 flex justify-end gap-3 bg-white">
+                  <button onClick={() => navigator.clipboard.writeText(JSON.stringify(selectedMessage.fullResponse, null, 2))} className="px-6 py-2 border border-gray-300 hover:bg-gray-50 rounded-lg font-medium transition-colors text-gray-700">
                     Copy JSON
                   </button>
-                  <button
-                    onClick={() => setSelectedMessage(null)}
-                    className="px-6 py-2 bg-gradient-to-r from-rapidscale-600 to-rapidscale-500 hover:from-rapidscale-500 hover:to-rapidscale-400 rounded-lg font-medium transition-all"
-                  >
+                  <button onClick={() => setSelectedMessage(null)} className="px-6 py-2 bg-rapidscale-600 hover:bg-rapidscale-700 text-white rounded-lg font-medium transition-all">
                     Close
                   </button>
                 </div>
@@ -356,6 +264,6 @@ export default function ChatInterface() {
           </>
         )}
       </AnimatePresence>
-    </section>
+    </div>
   )
 }
