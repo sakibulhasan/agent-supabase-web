@@ -6,15 +6,23 @@ A high-performance, modern landing page with an integrated AI chatbot built with
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.6-blue?style=for-the-badge&logo=typescript)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-38B2AC?style=for-the-badge&logo=tailwind-css)
 
+## 📚 Documentation
+
+- **[Quick Start Guide](QUICKSTART.md)** - Get up and running in 3 steps
+- **[Project Summary](PROJECT_SUMMARY.md)** - Overview of what's been built
+- **[Technical Documentation](TECHNICAL.md)** - In-depth technical details
+- **[Deployment Guide](DEPLOYMENT.md)** - Deploy to Vercel or Netlify
+- **[Documentation Map](DOCS_MAP.md)** - Navigate all documentation files
+
 ## 🚀 Features
 
 - **Modern UI/UX**: Sleek dark theme with glassmorphism effects and smooth animations
 - **AI Chatbot**: ChatGPT-like interface with typing effect simulation
-- **Backend Integration**: Connects to local backend at `http://localhost:8080/ask`
+- **Backend Integration**: Configurable API URL via environment variables
 - **Responsive Design**: Mobile-first approach with full desktop support
 - **Performance Optimized**: Built with Next.js 15 App Router and Server Components
 - **Smooth Animations**: Framer Motion powered transitions and interactions
-
+- **CI/CD Pipeline**: Automated deployment to Google Cloud Run via GitHub Actions
 ## 🛠️ Tech Stack
 
 - **Framework**: Next.js 15 (App Router)
@@ -23,39 +31,71 @@ A high-performance, modern landing page with an integrated AI chatbot built with
 - **Icons**: Lucide React
 - **Animation**: Framer Motion
 - **State Management**: React Hooks
+## 📋 Prerequisites
+
+- Node.js 18.17 or later
+- npm, yarn, or pnpm
+- Backend API server (configured via `.env.local`)
+
+## ⚙️ Environment Configuration
+
+Create a `.env.local` file in the root directory:
+
+```env
+NEXT_PUBLIC_API_URL=https://your-api-url.com/ask
+```
+
+The chatbot will use this URL to send requests. If not set, it defaults to `http://localhost:8080/ask`.
+```bash
+# Install dependencies
+npm install
+
+# Configure environment
+cp .env.local.example .env.local
+# Edit .env.local with your API URL
+
+# Run development server
+npm run dev
+
+# Open http://localhost:3000
+```
+- **Animation**: Framer Motion
+- **State Management**: React Hooks
 
 ## 📋 Prerequisites
 
 - Node.js 18.17 or later
 - npm, yarn, or pnpm
-- Backend server running on `http://localhost:8080/ask` (optional for testing)
+## 🔌 Backend Integration
 
-## 🔧 Installation
+The chatbot sends POST requests to the URL specified in `NEXT_PUBLIC_API_URL` with the following payload:
 
-1. **Clone the repository**:
-```bash
-git clone <repository-url>
-cd agent-supabase-web
+```json
+{
+  "question": "user's message"
+}
 ```
 
-2. **Install dependencies**:
-```bash
-npm install
-# or
-yarn install
-# or
-pnpm install
+Expected backend response format (any of these keys will work):
+```json
+{
+  "answer": "AI response text"
+}
+```
+or
+```json
+{
+  "response": "AI response text"
+}
+```
+or
+```json
+{
+  "message": "AI response text"
+}
 ```
 
-3. **Run the development server**:
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-```
-
+For testing purposes, you can use the included `server-example.js`. See **[Quick Start Guide](QUICKSTART.md)** for details.
 4. **Open your browser**:
 Navigate to [http://localhost:3000](http://localhost:3000)
 
@@ -102,46 +142,27 @@ agent-supabase-web/
 ├── app/
 │   ├── layout.tsx          # Root layout with global styles
 │   ├── page.tsx            # Main landing page
-│   └── globals.css         # Global CSS with Tailwind
-├── components/
-│   ├── Header.tsx          # Navigation header
-│   ├── Hero.tsx            # Hero section
-│   ├── Features.tsx        # Features grid
-│   └── ChatInterface.tsx   # AI chatbot component
-├── public/                 # Static assets
-├── tailwind.config.ts      # Tailwind configuration
-├── tsconfig.json           # TypeScript configuration
-└── package.json            # Dependencies
-```
-
 ## 🎨 Customization
 
 ### Colors
 
-The project uses a custom color palette defined in `tailwind.config.ts`:
+The project uses a custom color palette defined in `tailwind.config.ts`. See **[Technical Documentation](TECHNICAL.md)** for details.
 
-```typescript
-rapidscale: {
-  50: '#ecfeff',
-  100: '#cffafe',
-  // ... more shades
-  900: '#164e63',
-}
+### API Configuration
+
+Update the `.env.local` file to change the backend API URL:
+
+```env
+NEXT_PUBLIC_API_URL=https://your-new-api-url.com/endpoint
 ```
 
-### Chat Backend URL
+## 📖 Additional Documentation
 
-To change the backend URL, modify the `fetch` call in `components/ChatInterface.tsx`:
-
-```typescript
-const response = await fetch('YOUR_BACKEND_URL', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  body: JSON.stringify({ question: userMessage.content }),
-})
-```
+- **[Project Summary](PROJECT_SUMMARY.md)** - Complete overview of the project structure
+- **[Technical Documentation](TECHNICAL.md)** - Detailed component specifications and architecture
+- **[Quick Start Guide](QUICKSTART.md)** - Step-by-step setup instructions
+- **[Deployment Guide](DEPLOYMENT.md)** - Deploy to various platforms
+- **[CI/CD Setup](CICD_SETUP.md)** - Automated deployment configuration Chat Backend URL
 
 ## 🚀 Build for Production
 
@@ -150,20 +171,35 @@ npm run build
 npm start
 ```
 
-## 📝 Component Details
+## 🌐 Deployment
 
-### ChatInterface Component
+Multiple deployment options are available:
 
-The core chatbot component includes:
-- Message state management with TypeScript interfaces
-- Smooth typing effect simulation
-- Auto-scrolling to latest message
-- Loading states and error handling
-- Keyboard shortcuts (Enter to send, Shift+Enter for new line)
+- **[Vercel](DEPLOYMENT.md#option-1-vercel-recommended---5-minutes)** (Recommended) - Quick deployment with zero configuration
+- **[Netlify](DEPLOYMENT.md#option-2-netlify-alternative)** - Alternative serverless platform
+
+See the **[Deployment Guide](DEPLOYMENT.md)** for detailed instructions on each option.eaders: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({ question: userMessage.content }),
+})
+```
+
+## 🚀 Build for Production
 
 ### Animations
 
 All components use Framer Motion for:
+- Initial page load animations
+- Scroll-triggered reveals
+- Hover effects
+- Message appearance transitions
+
+See **[Technical Documentation](TECHNICAL.md)** for detailed animation specifications.
+
+## 🔐 Environment Variables
+
+- `NEXT_PUBLIC_API_URL`: Backend API endpoint (required)
 - Initial page load animations
 - Scroll-triggered reveals
 - Hover effects

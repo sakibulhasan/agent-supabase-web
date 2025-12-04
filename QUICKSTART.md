@@ -1,5 +1,7 @@
 # Quick Start Guide
 
+> **Navigation**: [← Back to README](README.md) | [Project Summary](PROJECT_SUMMARY.md) | [Technical Docs](TECHNICAL.md) | [Deployment](DEPLOYMENT.md) | [📚 Docs Map](DOCS_MAP.md)
+
 ## 🚀 Getting Started in 3 Steps
 
 ### 1. Install Dependencies
@@ -54,14 +56,24 @@ Example:
 }
 ```
 
-Update the API URL in `components/ChatInterface.tsx`:
-```typescript
-const response = await fetch('YOUR_BACKEND_URL', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ question: userMessage.content }),
-})
+Configure the API URL in your `.env.local` file:
+```env
+NEXT_PUBLIC_API_URL=https://your-backend-url.com/ask
 ```
+
+See **[Backend Integration](README.md#-backend-integration)** in the README for more details.
+
+---
+
+## 🌐 Deploy Your Application
+
+Ready to deploy? You have several options:
+
+### Quick Deploy (5 minutes)
+- **[Vercel](DEPLOYMENT.md#option-1-vercel-recommended---5-minutes)** (Recommended) - Zero configuration, instant deployment
+- **[Netlify](DEPLOYMENT.md#option-2-netlify-alternative)** - Alternative serverless platform
+
+See the full **[Deployment Guide](DEPLOYMENT.md)** for detailed instructions.
 
 ---
 
@@ -105,18 +117,7 @@ Faster: 10-20ms
 Normal: 30-40ms  
 Slower: 50-80ms
 
-### Modify Initial Greeting
-
-Edit `components/ChatInterface.tsx`, lines 15-19:
-```typescript
-const [messages, setMessages] = useState<Message[]>([
-  {
-    id: '1',
-    role: 'assistant',
-    content: 'Your custom greeting here',
-  },
-])
-```
+For more customization options, see the **[Technical Documentation](TECHNICAL.md)**.
 
 ---
 
@@ -127,9 +128,10 @@ const [messages, setMessages] = useState<Message[]>([
 **Problem**: "Failed to get response from backend"
 
 **Solutions**:
-1. Check if backend is running: `curl http://localhost:8080/health`
-2. Verify backend URL in ChatInterface.tsx
+1. Check if backend is running: `curl http://localhost:8080/ask`
+2. Verify `NEXT_PUBLIC_API_URL` in `.env.local`
 3. Check browser console for CORS errors
+4. Ensure backend accepts POST requests with JSON body
 4. Ensure backend has CORS enabled
 
 ### TypeScript Errors
@@ -165,31 +167,31 @@ npm run build
 
 # Start production server
 npm start
-
-# Or export static site
-npm run build && npx next export
 ```
+
+For deployment to production platforms, see:
+- **[Deployment Guide](DEPLOYMENT.md)** - Vercel, Netlify, Docker options
+- **[CI/CD Setup Guide](CICD_SETUP.md)** - Automated deployment to Google Cloud Run
 
 ---
 
-## 🔐 Security Best Practices
+## 📚 Next Steps
 
-For production deployment:
+Now that you're up and running:
 
-1. **Use Environment Variables**:
-```env
-# .env.local
-NEXT_PUBLIC_API_URL=https://your-api.com/ask
-API_SECRET_KEY=your-secret-key
-```
+1. **Customize the design** - See color and styling options above
+2. **Connect your backend** - Configure `.env.local` with your API URL
+3. **Deploy to production** - Check out the [Deployment Guide](DEPLOYMENT.md)
+4. **Learn the architecture** - Dive into [Technical Documentation](TECHNICAL.md)
 
-2. **Add Rate Limiting** on your backend
+---
 
-3. **Implement Authentication** for chat access
+## 🆘 Need Help?
 
-4. **Sanitize User Input** before sending to backend
-
-5. **Use HTTPS** for all API calls
+- **Configuration issues**: Check [Technical Documentation](TECHNICAL.md)
+- **Deployment questions**: See [Deployment Guide](DEPLOYMENT.md)
+- **Project overview**: Review [Project Summary](PROJECT_SUMMARY.md)
+- **General info**: Back to [README](README.md)
 
 ---
 
